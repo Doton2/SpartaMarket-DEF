@@ -4,11 +4,13 @@ from .models import User
 class UserSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('name','Nick_name','birthday','gender','content')
+        # exclude = ['password']
 
     def create(self , vlisated_data):
         user = User(
             username = vlisated_data['username'],
+            email = vlisated_data['email'],
             name = vlisated_data['name'],
             Nick_name = vlisated_data['Nick_name'],
             birthday = vlisated_data['birthday'],
@@ -18,5 +20,4 @@ class UserSerializers(serializers.ModelSerializer):
         user.set_password(vlisated_data['password'])
         user.save()
         return user
-    
     

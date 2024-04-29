@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class User(AbstractUser):
+    email = models.EmailField(unique=True,)
     name = models.CharField(max_length=20)
     Nick_name = models.CharField(max_length=20)
     birthday = models.DateField()
@@ -13,4 +14,4 @@ class User(AbstractUser):
     ]
     gender = models.CharField(max_length=1, choices=gender_choice, blank= True)
     content = models.TextField(blank=True)
-    
+

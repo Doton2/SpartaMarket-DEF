@@ -10,4 +10,5 @@ urlpatterns = [
     path('', views.signup),
     path("login/", TokenObtainPairView.as_view()),
     path("token/refresh/", TokenRefreshView.as_view()),
+    path('<str:username>/', views.profile),
 ]
