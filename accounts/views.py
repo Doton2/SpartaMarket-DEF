@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializers
 from rest_framework.response import Response
 from .models import User
+from rest_framework import status
 
 # Create your views here.
 
@@ -16,7 +17,7 @@ def signup(request):
         return Response(serializer.data)
 
 
-@api_view(['GEt'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request, username):
     profile =  get_object_or_404(User, username=username)
