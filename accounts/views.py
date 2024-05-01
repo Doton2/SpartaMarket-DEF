@@ -1,26 +1,20 @@
 from django.shortcuts import get_object_or_404, render
-from rest_framework.decorators import api_view, permission_classes,authentication_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializers
 from rest_framework.response import Response
 from .models import User
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, Token
-from rest_framework_simplejwt.models import TokenUser
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.hashers import make_password
+
 # Create your views here.
 
 
 class UserAPIView(APIView):
-    def post(self, request):
-        serializer = UserSerializers(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.create(request.data)
-            return Response(serializer.data)
-
     @permission_classes([IsAuthenticated])
-    def delete(self,request):
+    def delete(self, request):
         user = request.user 
         password = request.data.get('password')
         if password :
@@ -29,6 +23,13 @@ class UserAPIView(APIView):
                 return Response({'message': f'{user.username} Delete'})
             return Response({'message':'password different'})
         return Response({'message':'password not valid'})
+    
+    def post(self, request):
+        serializer = UserSerializers(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.create(request.data)
+            return Response(serializer.data)
+
 
 
 class UserDetail(APIView):
@@ -51,15 +52,33 @@ class UserDetail(APIView):
         
         
 
-class logoutAPIView(APIView):
-    def post(self, request):
-        token = request.data.get('refresh')
-        if token: 
-            try:
-                re_token = RefreshToken(token)
-                re_token.blacklist()
-                return Response({'message': 'logout'})
-            except:
-                return Response({'message': 'Already logout'})
-        return Response({'message': 'not login'})
 
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    token = request.data.get('refresh')
+    if token: 
+        try:
+            re_token = RefreshToken(token)
+            re_token.blacklist()
+            return Response({'message': 'logout'})
+        except:
+            return Response({'message': 'Already logout'})
+    return Response({'message': 'not login'})
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def password(request):
+    user = request.user
+    new_password = request.data.get('new_password')
+    old_password = request.data.get('old_password')
+    if new_password and old_password:
+        if new_password != old_password:
+            user.set_password(new_password)
+            user.save()
+            return Response({'message': 'chang password'})
+        return Response({'message': ''' 'Old_password' and 'new_password' must be different '''})
+    return Response({'message': 'need new_password, old_passwerd'})

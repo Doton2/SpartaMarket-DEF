@@ -10,7 +10,6 @@ from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 class ProductAPIView(APIView):
-
     @permission_classes([IsAuthenticated])
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
@@ -43,7 +42,7 @@ class ProductDetail(APIView):
         product = get_object_or_404(Product,id=product_id)
         if product.author_id == request.user.id:
             product.delete()
-            message = { 'product': f'product{product_id} delete'}
+            message = { 'message': f'product{product_id} delete'}
             return Response(message,status=status.HTTP_200_OK)
         message = {'message': f'author{product.author_id} is different'}  
         return Response(message,status=status.HTTP_400_BAD_REQUEST)

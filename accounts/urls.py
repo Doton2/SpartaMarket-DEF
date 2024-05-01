@@ -10,8 +10,8 @@ app_name ='accounts'
 urlpatterns = [
     path('', views.UserAPIView.as_view()),
     path("login/", TokenObtainPairView.as_view()),
-    path('logout/',views.logoutAPIView.as_view() ),
+    path('logout/',views.logout),
+    path('password/', views.password ),
     # path("token/refresh/", TokenRefreshView.as_view()),
     path('<str:username>/', views.UserDetail.as_view()),
-    # path('password/',vlews.)
 ]
