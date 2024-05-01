@@ -5,21 +5,52 @@ from .serializers import UserSerializers
 from rest_framework.response import Response
 from .models import User
 from rest_framework import status
+from rest_framework.views import APIView
 
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.models import TokenUser
 # Create your views here.
 
 
-@api_view(['POST'])
-def signup(request):
-    serializer = UserSerializers(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        serializer.create(request.data)
+class UserAPIView(APIView):
+    def post(request):
+        serializer = UserSerializers(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.create(request.data)
+            return Response(serializer.data)
+
+    @permission_classes([IsAuthenticated])
+    def delete(request):
+        user = request.user 
+        password = request.data.get('password')
+        if password :
+            if user.check_password(password):
+                user.delete()
+                return Response({'message': f'{user.username} Delete'})
+            return Response({'message':'password different'})
+        return Response({'message':'password not valid'})
+
+
+class UserDetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, username):
+        profile =  get_object_or_404(User, username=username)
+        serializer = UserSerializers(profile)
         return Response(serializer.data)
 
+    def put(self, request, username):
+        profile =  get_object_or_404(User, username=username)
+        if profile.username == request.user.username:
+            serializer = UserSerializers(profile, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        message = {'message': f'{profile.username} is different '}  
+        return Response(message,status=status.HTTP_400_BAD_REQUEST)
+        
+        
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def profile(request, username):
-    profile =  get_object_or_404(User, username=username)
-    serializer = UserSerializers(profile)
-    return Response(serializer.data)
+
+
+

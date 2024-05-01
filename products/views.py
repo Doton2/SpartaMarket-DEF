@@ -35,7 +35,7 @@ class ProductDetail(APIView):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return Response(serializer.data,status=status.HTTP_200_OK)
-        message = {'author': f'author{product.author_id} is different '}  
+        message = {'message': f'author{product.author_id} is different '}  
         return Response(message,status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -45,6 +45,6 @@ class ProductDetail(APIView):
             product.delete()
             message = { 'product': f'product{product_id} delete'}
             return Response(message,status=status.HTTP_200_OK)
-        message = {'author': f'author{product.author_id} is different'}  
+        message = {'message': f'author{product.author_id} is different'}  
         return Response(message,status=status.HTTP_400_BAD_REQUEST)
     
