@@ -14,3 +14,4 @@ urlpatterns = [
     path('password/', views.password ),
     # path("token/refresh/", TokenRefreshView.as_view()),
     path('<str:username>/', views.UserDetail.as_view()),
+]
